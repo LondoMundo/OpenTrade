@@ -1,0 +1,2 @@
+Add in boxes to show stock values. If you open it sans terminal, there is nowhere for the text
+to be displayed at.
