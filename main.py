@@ -1,5 +1,7 @@
-import wx
 import urllib
+
+import wx
+
 
 class Main(wx.Frame):
     def __init__(self, parent, id):
@@ -14,18 +16,65 @@ class Main(wx.Frame):
 
 
         global static
-        static = wx.StaticText(panel, -1 ,variable)
+        static = wx.StaticText(panel, -1 ,variable, pos=(0,0), size=(100,200))
 
         f = open('stocks.txt', 'r')
         tickers = f.readlines()
-        print tickers
-        static.SetLabel(tickers[0] + tickers[1])
+        i=0
+        loop = 1
+        global allTickers
+        allTickers = ""
+        while loop==1:
+            try:
+
+                allTickers += tickers[i]
+                allTickers += "\n"
+                i+=1
+
+            except:
+
+                loop = 2
+        static.SetLabel(allTickers)
+        f.close()
+        global priceUpdate
+        def priceUpdate():
+            global prices
+            prices = wx.StaticText(panel, -1 ,variable, pos=(60,0), size=(100,200))
+
+            f = open('stocks.txt', 'r')
+            tickers = f.readlines()
+            i=0
+            loop = 1
+            global priceList
+            priceList = ""
+            while loop==1:
+                try:
+                    check = tickers[i]
+                    print tickers[i]
+                    price = urllib.urlopen("http://finance.yahoo.com/d/quotes.csv?s="+check+"&f=l1")
+                    price = price.read()
+                    print price
+
+                    priceList += price
+                    i+=1
+                except:
+                    loop = 2
+                    print "fail"
+            prices.SetLabel(priceList)
+        priceUpdate()
+
+
+
+
+
 
         update = wx.Button(panel, label = "update", pos = (260, 70))
         self.Bind(wx.EVT_BUTTON, self.update, update)
 
     def TrackStock(self, event):
-
+        entry = wx.TextEntryDialog(None, "Enter the symbol of the stock you want to track, All caps", "Stock Tracker")
+        #pass entry through toUpper. Never trust the user
+        entry = entry.ShowModal()
         toTrack = urllib.urlopen("http://finance.yahoo.com/d/quotes.csv?s=GOOG&f=s")
         out = toTrack.read()
         length = len(out)
@@ -63,7 +112,7 @@ class Main(wx.Frame):
                 case = False
 
     def update(self, event):
-        static.SetLabel("Woah!")
+        priceUpdate()
 
 if __name__ == '__main__':
     app=wx.PySimpleApp()
