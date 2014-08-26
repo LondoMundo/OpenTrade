@@ -16,7 +16,9 @@ class Main(wx.Frame):
 
 
         global static
-        static = wx.StaticText(panel, -1 ,variable, pos=(0,0), size=(100,200))
+        static = wx.StaticText(panel, -1 ,variable, pos=(50,0), size=(100,200))
+        global prices
+        prices = wx.StaticText(panel, -1 ,variable, pos=(110,0), size=(100,200))
 
         f = open('stocks.txt', 'r')
         tickers = f.readlines()
@@ -34,12 +36,18 @@ class Main(wx.Frame):
             except:
 
                 loop = 2
+        #This is the part of the logic that prints out the Ticker abbreviations
         static.SetLabel(allTickers)
         f.close()
+        global tickerList
+        def tickerList():
+            f = open("stocks.txt", 'r+')
+            namesList = f.read()
+            return namesList
         global priceUpdate
         def priceUpdate():
-            global prices
-            prices = wx.StaticText(panel, -1 ,variable, pos=(60,0), size=(100,200))
+
+
 
             f = open('stocks.txt', 'r')
             tickers = f.readlines()
@@ -61,6 +69,7 @@ class Main(wx.Frame):
                     loop = 2
                     print "fail"
             prices.SetLabel(priceList)
+            static.SetLabel(tickerList())
         priceUpdate()
 
 
@@ -74,19 +83,15 @@ class Main(wx.Frame):
     def TrackStock(self, event):
         entry = wx.TextEntryDialog(None, "Enter the symbol of the stock you want to track, All caps", "Stock Tracker")
         #pass entry through toUpper. Never trust the user
-        entry = entry.ShowModal()
-        toTrack = urllib.urlopen("http://finance.yahoo.com/d/quotes.csv?s=GOOG&f=s")
-        out = toTrack.read()
-        length = len(out)
-        length = length - 3
-        out = out[1:length]
-        print out
+        entry.ShowModal()
+        entry = entry.GetValue()
+        print entry
         #open the files to write to
         f = open('stocks.txt', 'r')
         file = f.read()
         f.close()
         f = open('stocks.txt', 'w+')
-        final = file + out + "\n"
+        final = file + entry + "\n"
         f.write(final)
         f.close()
 
